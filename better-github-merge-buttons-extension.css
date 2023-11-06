@@ -1,0 +1,85 @@
+/* All inactive buttons */
+button.btn-group-merge,
+button.btn-group-squash,
+button.btn-group-rebase {
+    display: inline-block !important;
+    pointer-events: none;
+    color: #d4d4d4;
+    background: #6e6d6d;
+}
+
+/* All active buttons */
+.merge-pr.is-merging .btn-group-merge,
+.merge-pr.is-squashing .btn-group-squash,
+.merge-pr.is-rebasing .btn-group-rebase {
+    pointer-events: auto;
+}
+
+/* Merge button: inactive */
+button.btn-group-merge {
+    /* no specific attributes */
+}
+
+/* Merge button: active */
+.merge-pr.is-merging .btn-group-merge {
+    background: #1a1ae9;
+    color: white;
+}
+
+/* Squash + Merge button: inactive */
+button.btn-group-squash {
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+}
+
+/* Squash + Merge button: active */
+.merge-pr.is-squashing .btn-group-squash {
+    color: white;
+    background: #c42222;
+}
+
+/* Rebase button: inactive */
+button.btn-group-rebase {
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+}
+
+/* Rebase button: active */
+.merge-pr.is-rebasing .btn-group-rebase {
+    background: #d78b00;
+    color: white;
+}
+
+/* Dropdown button: merge is active */
+.merge-pr.is-merging summary.select-menu-button {
+    background: #1a1ae9;
+}
+
+/* Dropdown button: merge is squashing */
+.merge-pr.is-squashing summary.select-menu-button {
+    background: #c42222;
+}
+
+/* Dropdown button: merge is rebasing */
+.merge-pr.is-rebasing summary.select-menu-button {
+    background: #d78b00;
+}
+
+/* Descriptions */
+/* Merge description */
+div.merge-message button[value="merge"] {
+    background: rgb(0 0 0);
+    color: #007aff;
+}
+
+/* Squash description */
+div.merge-message button[value="squash"] {
+    background: rgb(0 0 0);
+    color: #c42222;
+}
+
+/* Rebase description */
+div.merge-message button[value="rebase"] {
+    background: rgb(0 0 0);
+    color: #d78b00;
+}
