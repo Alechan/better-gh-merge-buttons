@@ -1,7 +1,12 @@
 /* All inactive buttons */
+/* Less specific than the active button selectors, so they can be overridden */
 button.btn-group-merge,
 button.btn-group-squash,
-button.btn-group-rebase {
+button.btn-group-rebase,
+/* More specific than the active button selectors, so they can override */
+.merge-pr.is-merging button.btn-group-merge:disabled,
+.merge-pr.is-merging button.btn-group-squash:disabled,
+.merge-pr.is-merging button.btn-group-rebase:disabled {
     display: inline-block !important;
     pointer-events: none;
     color: #d4d4d4;
@@ -50,6 +55,13 @@ button.btn-group-rebase {
     color: white;
 }
 
+/* Dropdown button: disabled */
+div.merge-message button[disabled="disabled"],
+div.merge-message button:disabled {
+    color: #d4d4d4;
+    background: #6e6d6d;
+}
+
 /* Dropdown button: merge is active */
 .merge-pr.is-merging summary.select-menu-button {
     background: #1a1ae9;
@@ -66,6 +78,7 @@ button.btn-group-rebase {
 }
 
 /* Descriptions */
+
 /* Merge description */
 div.merge-message button[value="merge"] {
     background: rgb(0 0 0);
