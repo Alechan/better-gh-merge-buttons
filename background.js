@@ -9,7 +9,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
 const githubPRUrlRegex = /https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/;
 
-
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
     betterGHMergeUIListener(tab).catch((err) => {
@@ -17,8 +16,6 @@ chrome.action.onClicked.addListener(async (tab) => {
         }
     )
 });
-
-
 
 // When the content script (from this extension) sends a message
 chrome.runtime.onMessage.addListener(
@@ -29,7 +26,6 @@ chrome.runtime.onMessage.addListener(
         sendResponse(promise);
     }
 );
-
 
 async function betterGHMergeUIListener(tab) {
     let url = tab.url;
