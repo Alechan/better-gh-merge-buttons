@@ -18,6 +18,8 @@ chrome.action.onClicked.addListener(async (tab) => {
     )
 });
 
+
+
 // When the content script (from this extension) sends a message
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -34,10 +36,29 @@ async function betterGHMergeUIListener(tab) {
 
     if (githubPRUrlRegex.test(url)) {
         await applyCSS(tab);
+        await subscribeToElementRender(tab);
     } else {
         return new Promise((resolve, reject) => {
             reject("better-gh-merge-buttons extension: not on a GitHub PR page");
         });
+    }
+}
+
+async function subscribeToElementRender(tab) {
+    await chrome.scripting.executeScript({
+        target: {tabId: tab.id},
+        function: logElementContentOnRender
+    });
+}
+
+function logElementContentOnRender() {
+    var selector = '#partial-discussion-header > div.d-flex.flex-items-center.flex-wrap.mt-0.gh-header-meta > div.flex-auto.min-width-0.mb-2 > span.commit-ref.css-truncate.user-select-contain.expandable.head-ref';
+    var element = document.querySelector(selector);
+
+    if (element) {
+        console.log('Inner content of the element:', element.innerHTML);
+    } else {
+        console.error('Element not found for the selector:', selector);
     }
 }
 
