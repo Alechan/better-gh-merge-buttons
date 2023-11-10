@@ -8,7 +8,6 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 const githubPRUrlRegex = /https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/;
-const branchRegex = /[^:]+:(\w+)/;
 
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
@@ -49,6 +48,7 @@ async function subscribeToElementRender(tab) {
 }
 
 function enableButtonForMergingOrSquashingOnRender() {
+    const branchRegex = /[^:]+:(\w+)/;
     var branchElementSelector = ".commit-ref.base-ref a";
     var mergePrElementSelector = '#partial-pull-merging > div.merge-pr';
 
