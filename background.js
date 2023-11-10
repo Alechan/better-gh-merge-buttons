@@ -8,6 +8,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 const githubPRUrlRegex = /https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/;
+const branchRegex = /[^:]+:(\w+)/;
 
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
@@ -48,28 +49,41 @@ async function subscribeToElementRender(tab) {
 }
 
 function enableButtonForMergingOrSquashingOnRender() {
-    var element = document.querySelectorAll(".commit-ref.base-ref a")[0];
+    var branchElementSelector = ".commit-ref.base-ref a";
+    var mergePrElementSelector = '#partial-pull-merging > div.merge-pr';
 
-    if (element) {
-        var branchName = element.text;
-        console.log('Branch name:', branchName);
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (!mutation.addedNodes) return;
 
-        var mergePrElement = document.querySelector('#partial-pull-merging > div.merge-pr');
-        
-        if (mergePrElement) {
-            mergePrElement.classList.remove('is-rebasing', 'is-merging', 'is-squashing');
+            var branchElement = document.querySelector(branchElementSelector);
+            var mergePrElement = document.querySelector(mergePrElementSelector);
 
-            if (branchName === 'master') {
-                mergePrElement.classList.add('is-merging');
-            } else if (branchName === 'develop') {
-                mergePrElement.classList.add('is-squashing');
+            if (branchElement && mergePrElement) {
+                observer.disconnect(); 
+
+                var branchName = branchElement.text;
+                let match = branchName.match(branchRegex);
+                if (match) {
+                    branchName = match[1];
+                }
+
+                mergePrElement.classList.remove('is-rebasing', 'is-merging', 'is-squashing');
+
+                if (branchName === 'master') {
+                    mergePrElement.classList.add('is-merging');
+                } else if (branchName === 'develop') {
+                    mergePrElement.classList.add('is-squashing');
+                }
             }
-        } else {
-            console.error('Merge PR element not found');
-        }
-    } else {
-        console.error('Element not found for the selector');
-    }
+        });
+    });
+
+    // Start observing the body for added nodes
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 }
 
 async function applyCSS(tab) {
