@@ -47,18 +47,32 @@ async function betterGHMergeUIListener(tab) {
 async function subscribeToElementRender(tab) {
     await chrome.scripting.executeScript({
         target: {tabId: tab.id},
-        function: logElementContentOnRender
+        function: enableButtonForMergingOrSquashingOnRender
     });
 }
 
-function logElementContentOnRender() {
-    var selector = '#partial-discussion-header > div.d-flex.flex-items-center.flex-wrap.mt-0.gh-header-meta > div.flex-auto.min-width-0.mb-2 > span.commit-ref.css-truncate.user-select-contain.expandable.head-ref';
-    var element = document.querySelector(selector);
+function enableButtonForMergingOrSquashingOnRender() {
+    var element = document.querySelectorAll(".commit-ref.base-ref a")[0];
 
     if (element) {
-        console.log('Inner content of the element:', element.innerHTML);
+        var branchName = element.text;
+        console.log('Branch name:', branchName);
+
+        var mergePrElement = document.querySelector('#partial-pull-merging > div.merge-pr');
+        
+        if (mergePrElement) {
+            mergePrElement.classList.remove('is-rebasing', 'is-merging', 'is-squashing');
+
+            if (branchName === 'master') {
+                mergePrElement.classList.add('is-merging');
+            } else if (branchName === 'develop') {
+                mergePrElement.classList.add('is-squashing');
+            }
+        } else {
+            console.error('Merge PR element not found');
+        }
     } else {
-        console.error('Element not found for the selector:', selector);
+        console.error('Element not found for the selector');
     }
 }
 
