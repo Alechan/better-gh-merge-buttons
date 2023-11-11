@@ -43,46 +43,7 @@ async function betterGHMergeUIListener(tab) {
 async function subscribeToElementRender(tab) {
     await chrome.scripting.executeScript({
         target: {tabId: tab.id},
-        function: enableButtonForMergingOrSquashingOnRender
-    });
-}
-
-function enableButtonForMergingOrSquashingOnRender() {
-    const branchRegex = /[^:]+:(\w+)/;
-    var branchElementSelector = ".commit-ref.base-ref a";
-    var mergePrElementSelector = '#partial-pull-merging > div.merge-pr';
-
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (!mutation.addedNodes) return;
-
-            var branchElement = document.querySelector(branchElementSelector);
-            var mergePrElement = document.querySelector(mergePrElementSelector);
-
-            if (branchElement && mergePrElement) {
-                observer.disconnect(); 
-
-                var branchName = branchElement.text;
-                let match = branchName.match(branchRegex);
-                if (match) {
-                    branchName = match[1];
-                }
-
-                mergePrElement.classList.remove('is-rebasing', 'is-merging', 'is-squashing');
-
-                if (branchName === 'master') {
-                    mergePrElement.classList.add('is-merging');
-                } else if (branchName === 'develop') {
-                    mergePrElement.classList.add('is-squashing');
-                }
-            }
-        });
-    });
-
-    // Start observing the body for added nodes
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
+        files : [ "select_default_branch.js" ],
     });
 }
 
