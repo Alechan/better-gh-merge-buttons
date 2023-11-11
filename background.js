@@ -9,7 +9,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
 const githubPRUrlRegex = /https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/\d+/;
 
-
 // When the user clicks on the extension action
 chrome.action.onClicked.addListener(async (tab) => {
     betterGHMergeUIListener(tab).catch((err) => {
@@ -28,17 +27,24 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-
 async function betterGHMergeUIListener(tab) {
     let url = tab.url;
 
     if (githubPRUrlRegex.test(url)) {
         await applyCSS(tab);
+        await subscribeToElementRender(tab);
     } else {
         return new Promise((resolve, reject) => {
             reject("better-gh-merge-buttons extension: not on a GitHub PR page");
         });
     }
+}
+
+async function subscribeToElementRender(tab) {
+    await chrome.scripting.executeScript({
+        target: {tabId: tab.id},
+        files : [ "select_default_branch.js" ],
+    });
 }
 
 async function applyCSS(tab) {
