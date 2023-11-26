@@ -1,8 +1,20 @@
 // The function to run
 enableButtonForMergingOrSquashingOnRender();
 
-function findBranchElement() {
-    return document.querySelector(".commit-ref.base-ref a");
+function findBaseBranchName() {
+    let branchElement = document.querySelector(".commit-ref.base-ref a");
+    if (!!branchElement) {
+        return extractBranchName(branchElement);
+    }
+    return null;
+}
+
+function findHeadBranchName() {
+    let branchElement = document.querySelector(".commit-ref.head-ref a");
+    if (!!branchElement) {
+        return extractBranchName(branchElement);
+    }
+    return null;
 }
 
 function findMergePRElement() {
@@ -16,15 +28,19 @@ function enableButtonForMergingOrSquashingOnRender() {
             let mutationHasAddedNodes = mutation.addedNodes;
             if (!mutationHasAddedNodes) return;
 
-            const branchElement = findBranchElement();
+            const baseBranchName = findBaseBranchName();
+            const headBranchName = findHeadBranchName();
             const mergePrElement = findMergePRElement();
+            // TODO: we're finding the "selection buttons" here and later. Find a way to only do it once
+            const squashSelectionButton = findUniqueMergeTypeSelectionButton("squash")
+            const mergeSelectionButton = findUniqueMergeTypeSelectionButton("merge")
 
-            let mergeTypeBoxHasBeenLoaded = branchElement && mergePrElement;
+            let mergeTypeBoxHasBeenLoaded = baseBranchName && mergePrElement && squashSelectionButton && mergeSelectionButton;
             if (mergeTypeBoxHasBeenLoaded) {
-                // TODO: use the variable that we are defining? find a less ouroboros'ish alternative
+                // TODO: we're using the variable `observer` that we are defining. Find a less ouroboros'ish alternative
                 observer.disconnect();
 
-                setDefaultMergeType(branchElement);
+                setDefaultMergeType(baseBranchName, headBranchName);
             }
         });
     });
@@ -36,19 +52,41 @@ function enableButtonForMergingOrSquashingOnRender() {
     });
 }
 
-function setDefaultMergeType(branchElement) {
-    let branchName = extractBranchName(branchElement);
+function setDefaultMergeType(baseBranchName, headBranchName) {
+    // Base branch: destination
+    // Head branch: source
 
-    if (branchName === 'master') {
+    let masterBase = baseBranchName === 'master';
+    let isBackPort = checkIfIsBackPort(baseBranchName, headBranchName);
+    let developBase = baseBranchName === 'develop';
+
+    let shouldMerge = masterBase || isBackPort;
+    let shouldSquash = developBase || !isBackPort;
+
+    if (shouldMerge) {
         // Click the "activate merge button" button
         const mergeMethodButton = findUniqueMergeTypeSelectionButton("merge");
         mergeMethodButton.click();
-    } else if (branchName === 'develop') {
+        return
+    }
+
+    if (shouldSquash) {
         // Click the "activate squash button" button
         const squashMethodButton = findUniqueMergeTypeSelectionButton("squash");
         squashMethodButton.click();
     }
 }
+
+function checkIfIsBackPort(baseBranchName, headBranchName) {
+    // Base branch: destination
+    // Head branch: source
+    const regex = /^backport\/.+/;
+    const headIsBackport = regex.test(headBranchName)
+    const baseIsDevelop = baseBranchName === 'develop';
+
+    return headIsBackport && baseIsDevelop;
+}
+
 
 
 function extractBranchName(branchElement) {
