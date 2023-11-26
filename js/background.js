@@ -43,7 +43,7 @@ async function betterGHMergeUIListener(tab) {
 async function subscribeToElementRender(tab) {
     await chrome.scripting.executeScript({
         target: {tabId: tab.id},
-        files : [ "select_default_branch.js" ],
+        files : [ "js/select_default_branch.js" ],
     });
 }
 
