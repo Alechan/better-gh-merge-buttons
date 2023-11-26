@@ -31,10 +31,13 @@ function enableButtonForMergingOrSquashingOnRender() {
             const baseBranchName = findBaseBranchName();
             const headBranchName = findHeadBranchName();
             const mergePrElement = findMergePRElement();
+            // TODO: we're finding the "selection buttons" here and later. Find a way to only do it once
+            const squashSelectionButton = findUniqueMergeTypeSelectionButton("squash")
+            const mergeSelectionButton = findUniqueMergeTypeSelectionButton("merge")
 
-            let mergeTypeBoxHasBeenLoaded = baseBranchName && mergePrElement;
+            let mergeTypeBoxHasBeenLoaded = baseBranchName && mergePrElement && squashSelectionButton && mergeSelectionButton;
             if (mergeTypeBoxHasBeenLoaded) {
-                // TODO: use the variable `observer` that we are defining? find a less ouroboros'ish alternative
+                // TODO: we're using the variable `observer` that we are defining. Find a less ouroboros'ish alternative
                 observer.disconnect();
 
                 setDefaultMergeType(baseBranchName, headBranchName);
@@ -80,7 +83,6 @@ function checkIfIsBackPort(baseBranchName, headBranchName) {
     const regex = /^backport\/.+/;
     const headIsBackport = regex.test(headBranchName)
     const baseIsDevelop = baseBranchName === 'develop';
-    console.log(baseBranchName, headBranchName, headIsBackport, baseIsDevelop);
 
     return headIsBackport && baseIsDevelop;
 }
